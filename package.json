@@ -7,13 +7,29 @@
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "start": "react-native start",
-    "test": "jest"
+    "test": "jest",
+    "both": "react-native run-ios && react-native run-android",
+    "g-c-run": "cd android && ./gradlew clean && cd .. && react-native run-android",
+    "g-clean": "cd android && ./gradlew clean && cd ..",
+    "pod": "cd ios && pod install && cd ..",
+    "open-xcode": "xed -b ios",
+    "new-blood": "rm -rf node_modules && rm -rf yarn.lock && cd ios && rm -rf Podfile.lock && cd .. && yarn install && cd ios && pod install && cd .."
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.2.0",
+    "@react-native-picker/picker": "^2.11.4",
+    "@react-native/new-app-screen": "0.82.1",
+    "@react-navigation/bottom-tabs": "^7.8.8",
+    "@react-navigation/native": "^7.1.22",
+    "@reduxjs/toolkit": "^2.11.0",
     "react": "19.1.1",
     "react-native": "0.82.1",
-    "@react-native/new-app-screen": "0.82.1",
-    "react-native-safe-area-context": "^5.5.2"
+    "react-native-circular-progress": "^1.4.1",
+    "react-native-safe-area-context": "^5.5.2",
+    "react-native-size-matters": "^0.4.2",
+    "react-native-svg": "^15.15.1",
+    "react-redux": "^9.2.0",
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
