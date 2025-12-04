@@ -1,4 +1,4 @@
-package com.waterreminder2
+package com.keremserinkan.waterreminder
 
 import android.app.Application
 import com.facebook.react.PackageList

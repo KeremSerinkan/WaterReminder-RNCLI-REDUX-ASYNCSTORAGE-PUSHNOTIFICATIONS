@@ -1,4 +1,4 @@
-package com.waterreminder2
+package com.keremserinkan.waterreminder
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

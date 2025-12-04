@@ -274,7 +274,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.keremserinkan.waterreminder;
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.keremserinkan.WaterReminder;
 				PRODUCT_NAME = WaterReminder2;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -303,7 +303,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.keremserinkan.waterreminder;
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.keremserinkan.WaterReminder;
 				PRODUCT_NAME = WaterReminder2;
 				SWIFT_VERSION = 5.0;
