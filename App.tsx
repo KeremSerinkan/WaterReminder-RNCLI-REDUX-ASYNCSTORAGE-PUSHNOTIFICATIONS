@@ -19,11 +19,14 @@ import { Provider } from 'react-redux';
 import { persistor, store } from './src/data/redux/store';
 import { PersistGate } from 'redux-persist/integration/react';
 import { useNotificationManager } from './src/services/useNotificationManager';
-import { ReactNode } from 'react';
-
+import { ReactNode, useEffect } from 'react';
+import DayDetailScreen from './src/screens/DayDetailScreen';
+import HistoryStackNavigator from './src/screens/HistoryStackNavigator';
+import { enableScreens } from 'react-native-screens';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+enableScreens();
 const Tab = createBottomTabNavigator();
 function App() {
-
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
@@ -36,12 +39,10 @@ function App() {
                   headerShown: false,
                   tabBarActiveTintColor: colors.waterColor,
                   tabBarInactiveTintColor: 'gray',
-                  tabBarStyle: {
-                    backgroundColor: colors.appBG,
-                  },
+                  tabBarStyle: { backgroundColor: colors.appBG },
                 })}
               >
-                <Tab.Screen name="History" component={HistoryScreen} />
+                <Tab.Screen name="History" component={HistoryStackNavigator} />
                 <Tab.Screen name="Home" component={HomeScreen} />
                 <Tab.Screen name="Settings" component={SettingsScreen} />
               </Tab.Navigator>

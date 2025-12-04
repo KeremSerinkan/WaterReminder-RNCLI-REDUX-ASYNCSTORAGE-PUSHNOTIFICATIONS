@@ -47,8 +47,8 @@ export default function SettingsScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: colors.appBG },
-  title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  label: { fontSize: 18 },
+  label: { fontSize: 20 },
   intervalText: { fontSize: 18, color: colors.waterColor },
 });

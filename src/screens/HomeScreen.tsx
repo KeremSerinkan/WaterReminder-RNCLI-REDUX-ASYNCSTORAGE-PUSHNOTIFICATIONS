@@ -23,10 +23,12 @@ import { fonts } from '../styles/fonts';
 export default function HomeScreen() {
   const dispatch = useDispatch();
 
-  const water = useSelector((state: RootState) => state.water.water);
+
   const dailyGoal = useSelector((state: RootState) => state.water.dailyGoal);
   const history = useSelector((state: RootState) => state.water.history);
-
+  const todayKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+  const todayHistory = history.find((d) => d.date === todayKey);
+  const water = todayHistory?.entries.reduce((sum, e) => sum + e.amount, 0) || 0;
   const [goalModalVisible, setGoalModalVisible] = useState(false);
 
   const [undoFlash, setUndoFlash] = useState<number | null>(null);
@@ -64,37 +66,43 @@ export default function HomeScreen() {
       <Spacer height={vs(30)} />
 
       <View style={styles.buttonsRow}>
-  <AddLiquidButton
-    title={"+500 ml"}
-    icon={<WaterBottleIcon width={s(60)} height={vs(60)} />}
-    spacerHeight={vs(12)}
-    onPress={() => dispatch(addWater(500))}
-  />
-  <AddLiquidButton
-    title={"+200 ml"}
-    icon={<WaterGlassIcon width={s(60)} height={vs(60)} />}
-    spacerHeight={vs(12)}
-    onPress={() => dispatch(addWater(200))}
-  />
-</View>
+        <AddLiquidButton
+          title={"+500 ml"}
+          icon={<WaterBottleIcon width={s(60)} height={vs(60)} />}
+          spacerHeight={vs(12)}
+          onPress={() => dispatch(addWater(500))}
+        />
+        <AddLiquidButton
+          title={"+200 ml"}
+          icon={<WaterGlassIcon width={s(60)} height={vs(60)} />}
+          spacerHeight={vs(12)}
+          onPress={() => dispatch(addWater(200))}
+        />
+      </View>
 
-<View style={styles.buttonsRow}>
-  <CustomLiquidButton onAdd={(amount) => dispatch(addWater(amount))} />
-  <AddLiquidButton
-    title="Undo"
-    icon={<UndoIcon width={s(35)} height={s(35)} />}
-    spacerHeight={vs(10)}
-    onPress={() => {
-      if (history.length > 0) {
-        const lastAmount = history[history.length - 1];
-        setUndoFlash(lastAmount);
-        setTimeout(() => setUndoFlash(null), 1000);
-      }
-      dispatch(undo());
-    }}
-    style={{ backgroundColor: colors.undoColor }}
-  />
-</View>
+      <View style={styles.buttonsRow}>
+        <CustomLiquidButton onAdd={(amount) => dispatch(addWater(amount))} />
+        <AddLiquidButton
+          title="Undo"
+          icon={<UndoIcon width={s(35)} height={s(35)} />}
+          spacerHeight={vs(10)}
+          onPress={() => {
+            // Bugünün tarihini al
+            const todayKey = new Date().toISOString().split('T')[0];
+            const today = history.find((d) => d.date === todayKey);
+
+            if (today && today.entries.length > 0) {
+              const lastEntry = today.entries[today.entries.length - 1]; // son içilen miktar
+              setUndoFlash(lastEntry.amount); // sadece amount'u flash olarak ver
+              setTimeout(() => setUndoFlash(null), 1000);
+            }
+
+            dispatch(undo());
+          }}
+
+          style={{ backgroundColor: colors.undoColor }}
+        />
+      </View>
 
     </SafeAreaView>
   );

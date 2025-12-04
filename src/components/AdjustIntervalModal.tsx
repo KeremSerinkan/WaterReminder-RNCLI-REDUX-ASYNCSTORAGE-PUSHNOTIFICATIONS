@@ -29,7 +29,7 @@ export const AdjustIntervalModal: React.FC<Props> = ({ visible, onClose, onConfi
     <Modal transparent visible={visible} animationType="fade">
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          <Text style={styles.modalTitle}>Hatırlatma Aralığı</Text>
+          <Text style={styles.modalTitle}>Reminder Interval</Text>
 
           {/* Picker */}
           {Platform.OS === 'ios' ? (
@@ -57,10 +57,10 @@ export const AdjustIntervalModal: React.FC<Props> = ({ visible, onClose, onConfi
 
           <View style={styles.modalButtons}>
             <TouchableOpacity onPress={onClose}>
-              <Text style={styles.cancelText}>İptal</Text>
+              <Text style={styles.cancelText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={handleConfirm}>
-              <Text style={styles.confirmText}>Ayarla</Text>
+              <Text style={styles.confirmText}>Set</Text>
             </TouchableOpacity>
           </View>
         </View>

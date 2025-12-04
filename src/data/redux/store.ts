@@ -4,6 +4,7 @@ import { persistStore, persistReducer } from 'redux-persist'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import waterReducer from './slices/waterSlice'
 import notificationReducer from './slices/notificationSlice';
+
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,

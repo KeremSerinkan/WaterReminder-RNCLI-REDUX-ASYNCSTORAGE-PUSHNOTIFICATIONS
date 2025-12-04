@@ -1,15 +1,23 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+interface WaterEntry {
+  amount: number;
+  time: string; // ISO string
+}
+
+interface DayHistory {
+  date: string; // YYYY-MM-DD
+  entries: WaterEntry[];
+}
+
 interface WaterState {
-  water: number;
-  history: number[];
   dailyGoal: number;
+  history: DayHistory[];
 }
 
 const initialState: WaterState = {
-  water: 0,
-  history: [],
   dailyGoal: 2000,
+  history: [],
 };
 
 export const waterSlice = createSlice({
@@ -18,25 +26,35 @@ export const waterSlice = createSlice({
   reducers: {
     addWater: (state, action: PayloadAction<number>) => {
       const amount = action.payload;
-      const newWater = state.water + amount;
+      const now = new Date();
+      const dateKey = now.toISOString().split('T')[0]; // YYYY-MM-DD
+      const time = now.toISOString();
 
-      state.water = newWater; 
-      state.history.push(amount);
+      let day = state.history.find((d) => d.date === dateKey);
+      if (!day) {
+        day = { date: dateKey, entries: [] };
+        state.history.push(day);
+      }
+
+      day.entries.push({ amount, time });
     },
     undo: (state) => {
       if (state.history.length === 0) return;
 
-      const last = state.history.pop()!;
-      state.water = Math.max(state.water - last, 0);
+      const todayKey = new Date().toISOString().split('T')[0];
+      const today = state.history.find((d) => d.date === todayKey);
+      if (!today || today.entries.length === 0) return;
+
+      today.entries.pop();
+      if (today.entries.length === 0) {
+        state.history = state.history.filter((d) => d.date !== todayKey);
+      }
     },
     setDailyGoal: (state, action: PayloadAction<number>) => {
       state.dailyGoal = action.payload;
-
-      
-    }
-  }
+    },
+  },
 });
 
 export const { addWater, undo, setDailyGoal } = waterSlice.actions;
-
 export default waterSlice.reducer;
