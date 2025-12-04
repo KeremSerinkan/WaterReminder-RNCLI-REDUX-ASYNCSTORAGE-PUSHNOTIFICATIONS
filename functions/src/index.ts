@@ -31,8 +31,8 @@ export const checkReminders = onSchedule("every 1 minutes", async () => {
       const message = {
         token: fcmToken,
         notification: {
-          title: "Su İçme Zamanı 💧",
-          body: "Haydi bir bardak su iç!",
+          title: "Time to Drink Water 💧",
+          body: "Come on, have a glass of water!",
         },
       };
 

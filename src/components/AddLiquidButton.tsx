@@ -7,16 +7,17 @@ import { fonts } from '../styles/fonts'
 
 interface AddLiquidButtonProps {
   title: string;
-  icon: ReactNode;        
+  icon: ReactNode;
   spacerHeight: number;
   onPress: () => void;
+  style?: object;
 }
 
-const AddLiquidButton = ({title,icon,spacerHeight,onPress} : AddLiquidButtonProps) => {
+const AddLiquidButton = ({ title, icon, spacerHeight, onPress }: AddLiquidButtonProps) => {
   return (
     <TouchableOpacity onPress={onPress} style={styles.container}>
       {icon}
-      <Spacer height={spacerHeight}/>
+      <Spacer height={spacerHeight} />
       <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
   )
@@ -25,18 +26,23 @@ const AddLiquidButton = ({title,icon,spacerHeight,onPress} : AddLiquidButtonProp
 export default AddLiquidButton
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     width: s(110),
-  height: vs(120),
-    justifyContent:"center",
-    alignItems:"center",
+    height: vs(120),
+    justifyContent: "center",
+    alignItems: "center",
     padding: 15,
     backgroundColor: colors.buttonBG,
-    borderRadius: 12,
+    borderRadius: s(16),
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4.65,
+    elevation: 7
   },
-  text:{
-    fontSize: s(18), 
+  text: {
+    fontSize: s(18),
     fontFamily: fonts.bold,
-    color: colors.waterColor 
+    color: "#fff"
   }
 })

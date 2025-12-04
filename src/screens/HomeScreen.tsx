@@ -63,41 +63,38 @@ export default function HomeScreen() {
 
       <Spacer height={vs(30)} />
 
-      <View style={styles.buttons}>
-        <AddLiquidButton
-          title={"+500 ml"}
-          icon={<WaterBottleIcon width={s(45)} height={vs(45)} />}
-          spacerHeight={vs(15)}
-          onPress={() => dispatch(addWater(500))}
-        />
+      <View style={styles.buttonsRow}>
+  <AddLiquidButton
+    title={"+500 ml"}
+    icon={<WaterBottleIcon width={s(60)} height={vs(60)} />}
+    spacerHeight={vs(12)}
+    onPress={() => dispatch(addWater(500))}
+  />
+  <AddLiquidButton
+    title={"+200 ml"}
+    icon={<WaterGlassIcon width={s(60)} height={vs(60)} />}
+    spacerHeight={vs(12)}
+    onPress={() => dispatch(addWater(200))}
+  />
+</View>
 
-        <AddLiquidButton
-          title={"+200 ml"}
-          icon={<WaterGlassIcon width={s(50)} height={vs(50)} />}
-          spacerHeight={vs(9)}
-          onPress={() => dispatch(addWater(200))}
-        />
-      </View>
-
-      <Spacer height={vs(20)} />
-
-      <View style={styles.buttons}>
-        <CustomLiquidButton onAdd={(amount) => dispatch(addWater(amount))} />
-
-        <AddLiquidButton
-          title={"Undo"}
-          icon={<UndoIcon width={s(35)} height={s(35)} />}
-          spacerHeight={vs(8)}
-          onPress={() => {
-            if (history.length > 0) {
-              const lastAmount = history[history.length - 1];
-              setUndoFlash(lastAmount);
-              setTimeout(() => setUndoFlash(null), 1000); 
-            }
-            dispatch(undo());
-          }}
-        />
-      </View>
+<View style={styles.buttonsRow}>
+  <CustomLiquidButton onAdd={(amount) => dispatch(addWater(amount))} />
+  <AddLiquidButton
+    title="Undo"
+    icon={<UndoIcon width={s(35)} height={s(35)} />}
+    spacerHeight={vs(10)}
+    onPress={() => {
+      if (history.length > 0) {
+        const lastAmount = history[history.length - 1];
+        setUndoFlash(lastAmount);
+        setTimeout(() => setUndoFlash(null), 1000);
+      }
+      dispatch(undo());
+    }}
+    style={{ backgroundColor: colors.undoColor }}
+  />
+</View>
 
     </SafeAreaView>
   );
@@ -107,16 +104,20 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: colors.appBG
+    backgroundColor: colors.appBG,
+    paddingTop: vs(20)
   },
   title: {
     fontFamily: fonts.bold,
-    fontSize: 28
+    fontSize: s(28),
+    color: "#0077B6"
   },
-  buttons: {
+  buttonsRow: {
     flexDirection: 'row',
-    gap: s(30)
-  },
+    justifyContent: 'center',
+    gap: s(20),
+    marginVertical: vs(15)
+  }
 });
+

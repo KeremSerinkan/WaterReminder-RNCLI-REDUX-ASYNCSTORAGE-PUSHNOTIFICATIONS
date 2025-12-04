@@ -5,10 +5,10 @@ import { colors } from "../styles/colors";
 import { fonts } from "../styles/fonts";
 
 interface CustomLiquidButtonProps {
-  onAdd: (amount: number) => void;
+    onAdd: (amount: number) => void;
 }
 
-export const CustomLiquidButton = ({ onAdd } : CustomLiquidButtonProps) => {
+export const CustomLiquidButton = ({ onAdd }: CustomLiquidButtonProps) => {
     const [visible, setVisible] = useState(false);
     const [amount, setAmount] = useState("");
 
@@ -67,13 +67,17 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: 15,
-        backgroundColor: colors.buttonBG,
-        borderRadius: 12,
+        backgroundColor: colors.customButtonBG,
+        borderRadius: s(16),
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.25,
+        shadowRadius: 4.65,
+        elevation: 7
     },
-
     text: {
         fontSize: s(18),
-        color: colors.waterColor,
+        color: "#fff",
         fontFamily: fonts.bold,
         textAlign: "center"
     },

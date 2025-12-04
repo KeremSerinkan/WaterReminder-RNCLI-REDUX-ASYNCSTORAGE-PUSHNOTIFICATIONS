@@ -1,53 +1,54 @@
-import React from 'react';
-import { View, Text, Switch, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState } from 'react';
+import { View, Text, Switch, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../data/redux/store';
 import { setEnabled, setIntervalMinutes } from '../data/redux/slices/notificationSlice';
+import { colors } from '../styles/colors';
+import { AdjustIntervalModal } from '../components/AdjustIntervalModal';
 
 export default function SettingsScreen() {
   const dispatch = useDispatch();
   const notification = useSelector((state: RootState) => state.notification);
 
+  const [modalVisible, setModalVisible] = useState(false);
+
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Hatırlatma Ayarları</Text>
+      <Text style={styles.title}>Settings</Text>
 
       <View style={styles.row}>
-        <Text style={styles.label}>Bildirim Aç/Kapa</Text>
+        <Text style={styles.label}>Notifications</Text>
         <Switch
           value={notification.enabled}
-          onValueChange={(v) => {
-            dispatch(setEnabled(v));
-          }}
-
+          onValueChange={(v) => { dispatch(setEnabled(v)); }}
         />
       </View>
 
       {notification.enabled && (
-        <View style={styles.pickerContainer}>
-          <Text style={styles.label}>Hatırlatma Aralığı</Text>
-          <Picker
-            selectedValue={notification.intervalMinutes}
-            onValueChange={(v) => dispatch(setIntervalMinutes(v))}
-          >
-            <Picker.Item label="1 dakika" value={1} />
-            <Picker.Item label="30 dakika" value={30} />
-            <Picker.Item label="1 saat" value={60} />
-            <Picker.Item label="2 saat" value={120} />
-          </Picker>
+        <View style={styles.row}>
+          <Text style={styles.label}>Reminder Interval</Text>
+          <TouchableOpacity onPress={() => setModalVisible(true)}>
+            <Text style={styles.intervalText}>{notification.intervalMinutes} minutes</Text>
+          </TouchableOpacity>
         </View>
       )}
+
+      {/* Modal */}
+      <AdjustIntervalModal
+        visible={modalVisible}
+        initialInterval={notification.intervalMinutes}
+        onConfirm={(interval) => dispatch(setIntervalMinutes(interval))}
+        onClose={() => setModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
 
-
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: colors.appBG },
   title: { fontSize: 22, fontWeight: 'bold', marginBottom: 20 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
   label: { fontSize: 18 },
-  pickerContainer: { marginTop: 20 },
+  intervalText: { fontSize: 18, color: colors.waterColor },
 });
