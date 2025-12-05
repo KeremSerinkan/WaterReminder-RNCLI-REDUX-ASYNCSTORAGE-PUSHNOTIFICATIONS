@@ -33,7 +33,9 @@ export default function DayDetailScreen() {
   const entriesWithTime = useMemo(() => {
     return dayHistory.entries.map((entry) => {
       // eğer time yoksa current time ekle
+      console.log("currentTime:",entry.time)
       const time = entry.time || new Date().toISOString();
+      
       return { amount: entry.amount, time };
     });
   }, [dayHistory]);

@@ -27,15 +27,16 @@ export const waterSlice = createSlice({
     addWater: (state, action: PayloadAction<number>) => {
       const amount = action.payload;
       const now = new Date();
-      const dateKey = now.toISOString().split('T')[0]; // YYYY-MM-DD
-      const time = now.toISOString();
+      const offset = now.getTimezoneOffset(); // dakika
+      const localNow = new Date(now.getTime() - offset * 60 * 1000);
+      const dateKey = localNow.toISOString().split('T')[0]; // artık lokal tarih
+      const time = localNow.toISOString(); // artık lokal saat
 
       let day = state.history.find((d) => d.date === dateKey);
       if (!day) {
         day = { date: dateKey, entries: [] };
         state.history.push(day);
       }
-
       day.entries.push({ amount, time });
     },
     undo: (state) => {
