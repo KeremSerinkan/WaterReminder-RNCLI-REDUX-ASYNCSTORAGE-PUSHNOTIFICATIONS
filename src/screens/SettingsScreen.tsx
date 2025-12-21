@@ -6,6 +6,7 @@ import { RootState } from '../data/redux/store';
 import { setEnabled, setIntervalMinutes } from '../data/redux/slices/notificationSlice';
 import { colors } from '../styles/colors';
 import { AdjustIntervalModal } from '../components/AdjustIntervalModal';
+import { s } from 'react-native-size-matters';
 
 export default function SettingsScreen() {
   const dispatch = useDispatch();
@@ -46,9 +47,9 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: colors.appBG },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  label: { fontSize: 20 },
-  intervalText: { fontSize: 18, color: colors.waterColor },
+  container: { flex: 1, padding: s(18), backgroundColor: colors.appBG },
+  title: { fontSize: s(26), fontWeight: 'bold', marginBottom: s(20) },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: s(18) },
+  label: { fontSize: s(18) },
+  intervalText: { fontSize: s(16), color: colors.waterColor },
 });

@@ -7,8 +7,8 @@ interface NotificationState {
 }
 
 const initialState: NotificationState = {
-  intervalMinutes: 60,
-  enabled: false,
+  intervalMinutes: 120,
+  enabled: true,
 };
 
 const notificationSlice = createSlice({

@@ -1,28 +1,9 @@
 import { useEffect } from 'react';
 import messaging from '@react-native-firebase/messaging';
 import firestore from '@react-native-firebase/firestore';
-import { Platform, PermissionsAndroid } from 'react-native';
+import { Platform, PermissionsAndroid, Alert } from 'react-native';
 import { useSelector } from 'react-redux';
 import { RootState } from '../data/redux/store';
-
-// =====================
-// ANDROID PERMISSION
-// =====================
-const requestAndroidPermission = async () => {
-  const granted = await PermissionsAndroid.request(
-    PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-  );
-
-  console.log("Android permission:", granted);
-};
-
-// =====================
-// iOS PERMISSION
-// =====================
-const requestIOSPermission = async () => {
-  const auth = await messaging().requestPermission();
-  console.log("iOS permission:", auth);
-};
 
 // =====================
 // Firestore Save
@@ -39,13 +20,15 @@ const saveToFirestore = async (token: string, enabled: boolean, interval: number
       },
       { merge: true }
     );
-
     console.log("Saved to Firestore:", enabled, interval);
   } catch (e) {
     console.log("Firestore save error:", e);
   }
 };
 
+// =====================
+// Hook
+// =====================
 export const useNotificationManager = () => {
   const { enabled, intervalMinutes } = useSelector(
     (state: RootState) => state.notification
@@ -53,29 +36,73 @@ export const useNotificationManager = () => {
 
   useEffect(() => {
     const init = async () => {
-      if (Platform.OS === 'android') await requestAndroidPermission();
-      if (Platform.OS === 'ios') await requestIOSPermission();
+      try {
+        // -----------------
+        // Android izin kontrolü
+        // -----------------
+        if (Platform.OS === 'android') {
+          const granted = await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+          );
 
-      await messaging().registerDeviceForRemoteMessages();
-      const token = await messaging().getToken();
+          if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
+            console.log("Android notification permission denied");
+            return; // izin verilmediyse token alma
+          }
+        }
 
-      // İlk kayıt
-      await saveToFirestore(token, enabled, intervalMinutes);
+        // -----------------
+        // iOS izin
+        // -----------------
+        if (Platform.OS === 'ios') {
+          const authStatus = await messaging().requestPermission();
+          if (
+            authStatus !== messaging.AuthorizationStatus.AUTHORIZED &&
+            authStatus !== messaging.AuthorizationStatus.PROVISIONAL
+          ) {
+            console.log("iOS notification permission denied");
+            return;
+          }
+        }
 
-      // Token yenilenirse tekrar kaydet
-      messaging().onTokenRefresh(async (newToken) => {
-        await saveToFirestore(newToken, enabled, intervalMinutes);
-      });
+        // -----------------
+        // Cihazı remote mesajlar için kaydet
+        // -----------------
+        await messaging().registerDeviceForRemoteMessages();
+
+        // -----------------
+        // Token al ve kaydet
+        // -----------------
+        const token = await messaging().getToken();
+        console.log("FCM Token:", token);
+        await saveToFirestore(token, enabled, intervalMinutes);
+
+        // -----------------
+        // Token yenilenirse tekrar kaydet
+        // -----------------
+        messaging().onTokenRefresh(async (newToken) => {
+          console.log("FCM Token refreshed:", newToken);
+          await saveToFirestore(newToken, enabled, intervalMinutes);
+        });
+      } catch (e) {
+        console.log("Notification init error:", e);
+      }
     };
 
     init();
   }, []);
 
-  // Settings değiştiğinde Firestore'a yaz
+  // -----------------
+  // Ayarlar değiştiğinde Firestore'u güncelle
+  // -----------------
   useEffect(() => {
     const updateSettings = async () => {
-      const token = await messaging().getToken();
-      await saveToFirestore(token, enabled, intervalMinutes);
+      try {
+        const token = await messaging().getToken();
+        await saveToFirestore(token, enabled, intervalMinutes);
+      } catch (e) {
+        console.log("Update settings error:", e);
+      }
     };
 
     updateSettings();

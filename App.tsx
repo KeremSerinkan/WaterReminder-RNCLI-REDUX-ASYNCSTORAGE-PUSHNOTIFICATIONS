@@ -25,10 +25,20 @@ import { TabBarHomeIcon } from './src/assets/icons/tabHomeIcon';
 import { TabBarHistoryIcon } from './src/assets/icons/tabHistoryIcon';
 import { TabBarSettingsIcon } from './src/assets/icons/tabSettingsIcon';
 import { s, vs } from 'react-native-size-matters';
-
+import BootSplash from "react-native-bootsplash";
 enableScreens();
 const Tab = createBottomTabNavigator();
 function App() {
+  useEffect(() => {
+    const init = async () => {
+      // …do multiple sync or async tasks
+    };
+
+    init().finally(async () => {
+      await BootSplash.hide({ fade: true });
+      console.log("BootSplash has been hidden successfully");
+    });
+  }, []);
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>

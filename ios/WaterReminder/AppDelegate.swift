@@ -1,0 +1,78 @@
+import UIKit
+import React
+import React_RCTAppDelegate
+import ReactAppDependencyProvider
+import Firebase
+import FirebaseMessaging
+import RNBootSplash
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+  var window: UIWindow?
+
+  var reactNativeDelegate: ReactNativeDelegate?
+  var reactNativeFactory: RCTReactNativeFactory?
+  
+  func application(
+    _ application: UIApplication,
+    didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+  ) -> Bool {
+
+    // Firebase başlatılıyor
+    FirebaseApp.configure()
+
+    
+    // React Native Setup
+    let delegate = ReactNativeDelegate()
+    let factory = RCTReactNativeFactory(delegate: delegate)
+    delegate.dependencyProvider = RCTAppDependencyProvider()
+    reactNativeDelegate = delegate
+    reactNativeFactory = factory
+
+    window = UIWindow(frame: UIScreen.main.bounds)
+
+    factory.startReactNative(
+      withModuleName: "Water Reminder",
+      in: window,
+      launchOptions: launchOptions
+    )
+    if let rootView = window?.rootViewController?.view as? RCTRootView {
+        RNBootSplash.initWithStoryboard("BootSplash", rootView: rootView)
+    }
+    // 🔥 iOS Push Notification delegate
+    UNUserNotificationCenter.current().delegate = self
+    application.registerForRemoteNotifications()
+
+    return true
+  }
+
+  // 🔥 APNs Token → Firebase Messaging
+  func application(_ application: UIApplication,
+                   didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+      Messaging.messaging().apnsToken = deviceToken
+  }
+}
+
+class ReactNativeDelegate: RCTDefaultReactNativeFactoryDelegate {
+  override func sourceURL(for bridge: RCTBridge) -> URL? {
+    self.bundleURL()
+  }
+
+  override func bundleURL() -> URL? {
+#if DEBUG
+    RCTBundleURLProvider.sharedSettings().jsBundleURL(forBundleRoot: "index")
+#else
+    Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+#endif
+  }
+}
+
+// 🔥 Foreground Notification Handling (iOS 14+)
+extension AppDelegate: UNUserNotificationCenterDelegate {
+  func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    willPresent notification: UNNotification,
+    withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void
+  ) {
+      completionHandler([.banner, .sound, .badge])
+  }
+}

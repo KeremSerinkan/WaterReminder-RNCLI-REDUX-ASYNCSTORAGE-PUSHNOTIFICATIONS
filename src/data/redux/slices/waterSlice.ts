@@ -16,7 +16,7 @@ interface WaterState {
 }
 
 const initialState: WaterState = {
-  dailyGoal: 2000,
+  dailyGoal: 3000,
   history: [],
 };
 
