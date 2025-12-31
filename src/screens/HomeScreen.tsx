@@ -48,7 +48,7 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
 
-      <Text style={styles.title}>{formattedDate}</Text>
+      <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">{formattedDate}</Text>
 
       <Spacer height={vs(20)} />
 
@@ -103,7 +103,7 @@ export default function HomeScreen() {
           style={{ backgroundColor: colors.undoColor }}
         />
       </View>
-
+      
     </SafeAreaView>
   );
 }
@@ -114,18 +114,22 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     backgroundColor: colors.appBG,
-    paddingTop: vs(20)
+    paddingBottom: vs(24),
+    paddingHorizontal: s(16)
   },
   title: {
     fontFamily: fonts.bold,
     fontSize: s(28),
     color: "#0077B6"
+    ,
+    textAlign: 'center',
+    alignSelf: 'stretch'
   },
   buttonsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     gap: s(20),
-    marginVertical: vs(15)
+    marginVertical: vs(10)
   }
 });
 
