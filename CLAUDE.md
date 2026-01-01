@@ -2,13 +2,36 @@
 
 React Native CLI app for tracking daily water intake with push notification reminders.
 
+## Current Status (Jan 1, 2026)
+
+**Branch:** `rebuild/v2` (pushed to origin)
+**Status:** v2 rebuild COMPLETE and working
+
+### What Was Done:
+1. Complete UI rebuild with playful theme (bright colors, bouncy animations)
+2. Dark mode support with system toggle
+3. New folder-based architecture
+4. Custom animated components (ProgressRing, QuickAddButton with icons)
+5. Theme system with light/dark palettes
+6. Firebase Functions optimization (5-min scheduler, 80% cost reduction)
+7. Time-based diverse notification messages
+8. Fixed missing `react-native-worklets` dependency for Reanimated v4
+
+### Remaining Tasks:
+- Run ESLint and fix any issues
+- Test on physical devices
+- Merge `rebuild/v2` into `main` when ready
+
+---
+
 ## Tech Stack
 
 - **React Native CLI** (not Expo)
 - **TypeScript** for type safety
 - **Redux Toolkit** + Redux Persist + AsyncStorage for state management
-- **React Native Reanimated** for animations
+- **React Native Reanimated v4** for animations
 - **React Native SVG** for custom icons and progress ring
+- **React Native Worklets** (required by Reanimated v4)
 - **date-fns** for date handling
 - **Firebase Cloud Messaging** for push notifications
 - **Firestore** for device settings sync
@@ -55,7 +78,7 @@ src/
 │   └── index.ts            # Shared TypeScript types
 └── assets/
     └── icons/
-        └── WaterIcons.tsx  # SVG icons (glass, bottle, jug, etc.)
+        └── WaterIcons.tsx  # SVG icons (glass, bottle, jug, tab icons)
 ```
 
 ## Key Patterns
@@ -63,22 +86,24 @@ src/
 ### Theme System
 - `useTheme()` hook for accessing current theme
 - Supports light, dark, and system preference modes
-- Theme stored in Redux and persisted
+- Theme stored in Redux (`settingsSlice.themeMode`) and persisted
+- Colors defined in `src/theme/colors.ts`
 
 ### Animations
 - All animations use `react-native-reanimated`
 - Spring animations for bouncy button presses
 - Progress ring with smooth fill animation
-- Staggered list animations
+- Staggered list animations (FadeInUp with delay)
 
 ### State Management
-- `waterSlice`: Water entries by date, daily goal
-- `settingsSlice`: Theme mode, notification settings
-- Data persisted via AsyncStorage
+- `waterSlice`: Water entries by date, daily goal, selectors for today's data
+- `settingsSlice`: Theme mode, notification settings (enabled, interval)
+- Data persisted via AsyncStorage with redux-persist
 
 ### Navigation
-- Bottom tabs: Home, History, Settings
+- Bottom tabs: History, Home (center), Settings
 - History stack: HistoryScreen -> DayDetailScreen
+- Custom tab bar icons from WaterIcons.tsx
 
 ## Commands
 
@@ -95,6 +120,9 @@ yarn ios
 # Run Android
 yarn android
 
+# Check TypeScript errors
+npx tsc --noEmit
+
 # Deploy Firebase Functions
 cd functions && npm run deploy
 ```
@@ -102,44 +130,60 @@ cd functions && npm run deploy
 ## Firebase Functions
 
 Located in `functions/src/index.ts`:
-- Scheduled every 5 minutes (cost-optimized)
-- Queries only enabled devices
-- Time-based notification messages (morning, afternoon, evening)
-- Auto-cleanup of invalid FCM tokens
+- Scheduled every 5 minutes (cost-optimized from 1 minute)
+- Queries only enabled devices (`where("enabled", "==", true)`)
+- Time-based notification messages (morning, afternoon, evening, general)
+- Auto-cleanup of invalid FCM tokens on send failure
 
 ## Screens Overview
 
-### HomeScreen
-- Animated greeting based on time of day
-- Tappable progress ring to set daily goal
-- Quick add buttons with icons (250ml glass, 500ml bottle, 750ml jug)
-- Custom amount modal
-- Today's entries list with undo functionality
+### HomeScreen (`src/screens/HomeScreen/index.tsx`)
+- Animated greeting based on time of day ("Good morning!", etc.)
+- Tappable progress ring to set daily goal (InputModal)
+- Quick add buttons with icons:
+  - 250ml: Glass icon
+  - 500ml: Bottle icon
+  - 750ml: Jug icon
+- Custom amount button (opens InputModal)
+- Today's activity list (last 5 entries)
+- Undo button (removes last entry)
 
-### HistoryScreen
-- 2-column grid of day cards
-- Color-coded by goal completion
-- Tap to view day details
+### HistoryScreen (`src/screens/HistoryScreen/index.tsx`)
+- 2-column grid of day cards (FlatList)
+- Color-coded by goal completion (green/blue/red)
+- Staggered entrance animation
+- Tap card -> DayDetailScreen
 
-### SettingsScreen
-- Notification toggle & interval picker
+### SettingsScreen (`src/screens/SettingsScreen/index.tsx`)
+- Notification toggle switch
+- Interval picker (30min to 4hrs)
 - Theme selector (System/Light/Dark)
 - App version info
 
-### DayDetailScreen
+### DayDetailScreen (`src/screens/DayDetailScreen/index.tsx`)
 - Header with date and totals
 - List of all entries with times
-- Swipe to delete entries
+- Delete button for each entry
+- Back navigation
 
-## Rebuild Status
+## Color Palette
 
-The v2 rebuild is complete with all major features implemented:
-- Theme system with dark mode
-- Custom animated components (ProgressRing, QuickAddButton)
-- All 4 screens rebuilt with playful UI
-- Firebase Functions optimized for cost reduction
-- Type-safe codebase with proper navigation typing
+### Light Mode
+- Primary: `#6C5CE7` (vibrant purple)
+- Secondary: `#00CEC9` (teal)
+- Water: `#0984E3` (blue)
+- Success: `#00B894` (mint green)
+- Background: `#F8F9FA`
 
-Remaining items:
-- Run ESLint and fix any issues
-- Test on physical devices
+### Dark Mode
+- Primary: `#A29BFE` (soft purple)
+- Secondary: `#81ECEC` (light teal)
+- Background: `#1A1A2E` (deep navy)
+- Surface: `#16213E`
+
+## Important Notes
+
+1. **Entry Point:** `index.js` imports from `./src/app/App` (not root App.tsx)
+2. **Old files deleted:** `App.tsx`, `src/screens/HomeScreen.tsx`, etc. are removed
+3. **Reanimated v4 requires:** `react-native-worklets` package
+4. **Pods must be installed** after adding new native dependencies
