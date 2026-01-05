@@ -42,7 +42,11 @@ export const waterSlice = createSlice({
     undo: (state) => {
       if (state.history.length === 0) return;
 
-      const todayKey = new Date().toISOString().split('T')[0];
+      // Use local date to match addWater format
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      const localNow = new Date(now.getTime() - offset * 60 * 1000);
+      const todayKey = localNow.toISOString().split('T')[0];
       const today = state.history.find((d) => d.date === todayKey);
       if (!today || today.entries.length === 0) return;
 

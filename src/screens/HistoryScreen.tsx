@@ -32,29 +32,69 @@ export default function HistoryScreen() {
   const dailyGoal = useSelector((state: RootState) => state.water.dailyGoal);
   const history = useSelector((state: RootState) => state.water.history);
 
-  // history'den DayData array'i oluştur, undefined entries güvenli
+  // Generate continuous date range from today going back
   const historyData: DayData[] = useMemo(() => {
-    const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    // Helper to format date as YYYY-MM-DD in local timezone
+    const toLocalDateKey = (date: Date): string => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
 
-    // mevcut history map
-    let data = history
-      .map((d, index) => ({
-        date: d.date,
-        displayDate: new Date(d.date).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }),
-        total: d.entries?.reduce((a, b) => a + (b.amount || 0), 0) || 0,
-      }))
-      .sort((a, b) => (a.date < b.date ? 1 : -1)); // en güncel gün başta
+    // Get today's date in local timezone
+    const todayKey = toLocalDateKey(new Date());
 
-    // eğer bugünün tarihi yoksa ekle
-    if (!data.find(d => d.date.startsWith(today))) {
-      data.unshift({
-        date: today,
-        displayDate: new Date(today).toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' }),
+    // Create a map of existing history data for quick lookup
+    const historyMap = new Map<string, number>();
+    history.forEach((d) => {
+      const total = d.entries?.reduce((a, b) => a + (b.amount || 0), 0) || 0;
+      historyMap.set(d.date, total);
+    });
+
+    // Find the earliest date in history, or use today if no history
+    const allDates = history.map(d => d.date);
+    const earliestDate = allDates.length > 0
+      ? allDates.sort()[0]
+      : todayKey;
+
+    // Generate all days from earliest to today
+    const days: DayData[] = [];
+    const current = new Date();
+
+    // Start from today and go backwards
+    while (toLocalDateKey(current) >= earliestDate) {
+      const dateKey = toLocalDateKey(current);
+      const total = historyMap.get(dateKey) || 0;
+
+      days.push({
+        date: dateKey,
+        displayDate: new Date(dateKey + 'T12:00:00').toLocaleDateString('en-US', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short'
+        }),
+        total,
+      });
+
+      // Go back one day
+      current.setDate(current.getDate() - 1);
+    }
+
+    // If no days generated, at least show today
+    if (days.length === 0) {
+      days.push({
+        date: todayKey,
+        displayDate: new Date(todayKey + 'T12:00:00').toLocaleDateString('en-US', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short'
+        }),
         total: 0,
       });
     }
 
-    return data;
+    return days;
   }, [history]);
 
   // FlatList keyExtractor

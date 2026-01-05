@@ -26,7 +26,13 @@ export default function HomeScreen() {
 
   const dailyGoal = useSelector((state: RootState) => state.water.dailyGoal);
   const history = useSelector((state: RootState) => state.water.history);
-  const todayKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+
+  // Use local date to match waterSlice storage format
+  const now = new Date();
+  const offset = now.getTimezoneOffset();
+  const localNow = new Date(now.getTime() - offset * 60 * 1000);
+  const todayKey = localNow.toISOString().split('T')[0]; // YYYY-MM-DD (local)
+
   const todayHistory = history.find((d) => d.date === todayKey);
   const water = todayHistory?.entries.reduce((sum, e) => sum + e.amount, 0) || 0;
   const [goalModalVisible, setGoalModalVisible] = useState(false);
@@ -87,9 +93,12 @@ export default function HomeScreen() {
           icon={<UndoIcon width={s(35)} height={s(35)} />}
           spacerHeight={vs(10)}
           onPress={() => {
-            // Bugünün tarihini al
-            const todayKey = new Date().toISOString().split('T')[0];
-            const today = history.find((d) => d.date === todayKey);
+            // Get today's date in local timezone
+            const undoNow = new Date();
+            const undoOffset = undoNow.getTimezoneOffset();
+            const undoLocalNow = new Date(undoNow.getTime() - undoOffset * 60 * 1000);
+            const undoTodayKey = undoLocalNow.toISOString().split('T')[0];
+            const today = history.find((d) => d.date === undoTodayKey);
 
             if (today && today.entries.length > 0) {
               const lastEntry = today.entries[today.entries.length - 1]; // son içilen miktar
