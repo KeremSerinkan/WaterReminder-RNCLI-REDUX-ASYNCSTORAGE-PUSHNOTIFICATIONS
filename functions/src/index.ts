@@ -9,31 +9,79 @@ admin.initializeApp();
 // Notification message templates - friendly & casual tone
 const NOTIFICATION_MESSAGES = {
   morning: [
-    {title: "Good morning! 🌅", body: "Start your day with a refreshing glass of water"},
-    {title: "Rise and hydrate! ☀️", body: "Your body will thank you for that first sip"},
-    {title: "Morning water check! 💧", body: "Have you had your first drink today?"},
+    {
+      title: "Good morning! 🌅",
+      body: "Start your day with a refreshing glass of water",
+    },
+    {
+      title: "Rise and hydrate! ☀️",
+      body: "Your body will thank you for that first sip",
+    },
+    {
+      title: "Morning water check! 💧",
+      body: "Have you had your first drink today?",
+    },
   ],
   afternoon: [
-    {title: "Afternoon check-in! 🌤️", body: "Time for a quick water break"},
-    {title: "Hey there! 👋", body: "Don't forget to stay hydrated this afternoon"},
-    {title: "Hydration break! 💦", body: "A glass of water will boost your energy"},
-    {title: "Quick reminder! 💧", body: "Have you had water recently?"},
+    {
+      title: "Afternoon check-in! 🌤️",
+      body: "Time for a quick water break",
+    },
+    {
+      title: "Hey there! 👋",
+      body: "Don't forget to stay hydrated this afternoon",
+    },
+    {
+      title: "Hydration break! 💦",
+      body: "A glass of water will boost your energy",
+    },
+    {
+      title: "Quick reminder! 💧",
+      body: "Have you had water recently?",
+    },
   ],
   evening: [
-    {title: "Evening reminder! 🌙", body: "Stay hydrated before winding down"},
-    {title: "Almost done for today! 🌆", body: "One more glass to hit your goal?"},
-    {title: "Evening water time! 💧", body: "Keep up the good work, stay hydrated"},
+    {
+      title: "Evening reminder! 🌙",
+      body: "Stay hydrated before winding down",
+    },
+    {
+      title: "Almost done for today! 🌆",
+      body: "One more glass to hit your goal?",
+    },
+    {
+      title: "Evening water time! 💧",
+      body: "Keep up the good work, stay hydrated",
+    },
   ],
   general: [
-    {title: "Water break time! 💧", body: "Your plants need water, and so do you!"},
-    {title: "Hydration station calling! 🚰", body: "Time to refill your water bottle"},
-    {title: "Beep boop! 🤖", body: "This is your friendly water reminder"},
-    {title: "Stay refreshed! 💦", body: "A little water goes a long way"},
-    {title: "Thirsty? 💧", body: "Your body could use some hydration right now"},
+    {
+      title: "Water break time! 💧",
+      body: "Your plants need water, and so do you!",
+    },
+    {
+      title: "Hydration station calling! 🚰",
+      body: "Time to refill your water bottle",
+    },
+    {
+      title: "Beep boop! 🤖",
+      body: "This is your friendly water reminder",
+    },
+    {
+      title: "Stay refreshed! 💦",
+      body: "A little water goes a long way",
+    },
+    {
+      title: "Thirsty? 💧",
+      body: "Your body could use some hydration right now",
+    },
   ],
 };
 
-// Get time period based on current hour
+/**
+ * Get time period based on current hour
+ * @return {string} The time period: morning, afternoon, evening, or general
+ */
 function getTimePeriod(): "morning" | "afternoon" | "evening" | "general" {
   const hour = new Date().getHours();
   if (hour >= 5 && hour < 12) return "morning";
@@ -42,7 +90,10 @@ function getTimePeriod(): "morning" | "afternoon" | "evening" | "general" {
   return "general";
 }
 
-// Get a random notification message
+/**
+ * Get a random notification message based on time of day
+ * @return {object} Object with title and body strings
+ */
 function getRandomMessage(): {title: string; body: string} {
   const period = getTimePeriod();
   const messages = NOTIFICATION_MESSAGES[period];
@@ -117,23 +168,23 @@ export const checkReminders = onSchedule("every 5 minutes", async () => {
             lastSent: admin.firestore.Timestamp.now(),
           });
         })
-        .then(() => {})
+        .then(() => undefined)
         .catch((err: Error & {code?: string}) => {
-          logger.error(`Send failed for device ${doc.id}:`, err.message);
+          logger.error(`Send failed for ${doc.id}:`, err.message);
 
           // Clean up invalid tokens
           if (
             err.code === "messaging/invalid-registration-token" ||
             err.code === "messaging/registration-token-not-registered"
           ) {
-            logger.warn(`Removing invalid token for device ${doc.id}`);
+            logger.warn(`Removing invalid token for ${doc.id}`);
             const cleanupPromise = doc.ref
               .delete()
               .then(() => {
-                logger.info(`Deleted device ${doc.id} with invalid token.`);
+                logger.info(`Deleted ${doc.id} with invalid token.`);
               })
               .catch((deleteErr) => {
-                logger.error(`Failed to delete device ${doc.id}:`, deleteErr);
+                logger.error(`Failed to delete ${doc.id}:`, deleteErr);
               });
             cleanupPromises.push(cleanupPromise);
           }
@@ -152,5 +203,6 @@ export const checkReminders = onSchedule("every 5 minutes", async () => {
     logger.info(`Cleaned up ${cleanupPromises.length} invalid tokens.`);
   }
 
-  logger.info(`Completed reminder cycle. Sent ${sendPromises.length} reminders.`);
+  const count = sendPromises.length;
+  logger.info(`Completed reminder cycle. Sent ${count} reminders.`);
 });
